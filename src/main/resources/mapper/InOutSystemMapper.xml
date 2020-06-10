@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java.mapper.InOutSystemMapper">
+
+    <update id="updateSale" parameterType="Map" statementType="CALLABLE">
+        CALL pro_sale(
+          #{userName,mode=IN,jdbcType=VARCHAR},
+          #{pid,mode=IN,jdbcType=BIGINT},
+          #{num,mode=IN,jdbcType=INTEGER},
+          #{cost,mode=IN,jdbcType=REAL}
+        )
+    </update>
+
+    <!--查询销售信息-->
+    <select id="selectSale" parameterType="String" resultType="Map">
+        SELECT p.id,p.`productName`,s.price,s.`quantity`,s.`totalPrice`,
+        DATE_FORMAT(s.`saleDate`,'%Y-%m-%d') AS saleDate,u.`realName`
+        FROM product p INNER JOIN sale s ON p.id=s.productId INNER JOIN users u
+        ON s.`userId`=u.id
+        <choose>
+            <when test="_parameter==1">ORDER BY saleDate DESC</when>
+            <otherwise>ORDER BY totalPrice DESC</otherwise>
+        </choose>
+    </select>
+
+</mapper>
